@@ -1,12 +1,18 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import NavItem from './NavItem';
+import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
+    <>
+      {/* Main navbar */}
+      <nav className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md shadow-md z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            {/* Logo */}
             <Link to="/" className="flex-shrink-0 flex items-center">
               <h1 className="text-xl font-bold">
                 <span className="bg-gradient-to-r from-primary-red to-dark-red bg-clip-text text-transparent">
@@ -15,25 +21,70 @@ const Navbar = () => {
                 <span className="text-primary-blue"> PANEL SHOP</span>
               </h1>
             </Link>
+
+            {/* Desktop Nav */}
+            <div className="hidden md:flex items-center space-x-8">
+              <NavItem to="/" label="Home" />
+              <NavItem to="/about" label="About Us" />
+              <NavItem to="/services" label="Services" />
+              <NavItem to="/gallery" label="Gallery" />
+              <NavItem to="/admin" label="Admin" />
+              <Link
+                to="/request-quote"
+                className="whitespace-nowrap bg-gradient-to-r from-primary-red to-dark-red text-white py-2 px-6 rounded-md hover:opacity-70 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Request Quote
+              </Link>
+            </div>
+
+            {/* Mobile Hamburger */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="text-gray-800 focus:outline-none"
+              >
+                {isOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
           </div>
-
-        <div className="hidden md:flex items-center space-x-8">
-          <NavItem to="/" label="Home" />
-          <NavItem to="/about" label="About Us" />
-          <NavItem to="/services" label="Services" />
-          <NavItem to="/gallery" label="Gallery" /> 
-          <NavItem to="/admin" label="Admin" /> 
-          <Link
-            to="/request-quote"
-            className="whitespace-nowrap bg-gradient-to-r from-primary-red to-dark-red text-white py-2 px-6 rounded-md hover:opacity-70 transition-all duration-300 shadow-lg hover:shadow-xl"
-          >
-            Request Quote
-          </Link>
         </div>
+      </nav>
 
+      {/* Spacer for fixed nav height */}
+      <div className="h-16 md:hidden" />
+    {isOpen && (
+      <>
+        {/* Backdrop */}
+      <div
+        onClick={() => setIsOpen(false)}
+        className="fixed inset-0 bg-black/30 z-30"
+      />
+
+        {/* Floating mobile nav centered */}
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
+          <div className="w-full max-w-md backdrop-blur-lg bg-white/50 rounded-lg shadow-lg py-6 space-y-2 border border-white/40">
+            <NavItem to="/" label="Home" onClick={() => setIsOpen(false)} />
+            <hr className="border-white/60" />
+            <NavItem to="/about" label="About Us" onClick={() => setIsOpen(false)} />
+            <hr className="border-white/60" />
+            <NavItem to="/services" label="Services" onClick={() => setIsOpen(false)} />
+            <hr className="border-white/60" />
+            <NavItem to="/gallery" label="Gallery" onClick={() => setIsOpen(false)} />
+            <hr className="border-white/60" />
+            <NavItem to="/admin" label="Admin" onClick={() => setIsOpen(false)} />
+            <hr className="border-white/60" />
+            <Link
+              to="/request-quote"
+              onClick={() => setIsOpen(false)}
+              className="block text-center bg-gradient-to-r from-primary-red to-dark-red text-white py-2 rounded-md hover:opacity-80 transition-all duration-300 font-semibold"
+            >
+              Request Quote
+            </Link>
+          </div>
         </div>
-      </div>
-    </nav>
+      </>
+    )}
+    </>
   );
 };
 
