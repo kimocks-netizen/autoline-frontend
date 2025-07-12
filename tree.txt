@@ -1,0 +1,22 @@
+batman-panic-button/
+├── public/
+├── src/
+│   ├── api/
+│   │   ├── auth.ts
+│   │   ├── panic.ts
+│   │   └── index.ts
+│   ├── components/
+│   │   ├── Layout.tsx
+│   │   ├── PanicButton.tsx
+│   │   └── ActivePanics.tsx
+│   ├── pages/
+│   │   ├── LoginPage.tsx
+│   │   ├── DashboardPage.tsx
+│   │   └── HistoryPage.tsx
+│   ├── store/
+│   │   └── authStore.ts
+│   ├── App.tsx
+│   └── main.tsx
+├── .env
+├── package.json
+└── vite.config.ts
