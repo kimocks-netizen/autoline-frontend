@@ -2,6 +2,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import ImageUpload from './ImageUpload';
+import { supabase } from './supabaseClient'; // adjust path as needed
 
 const QuoteForm = () => {
   const formik = useFormik({
@@ -21,33 +22,53 @@ const QuoteForm = () => {
       description: Yup.string().required('Required')
     }),
     onSubmit: async (values) => {
-      try {
-        const formData = new FormData();
-        formData.append('name', values.name);
-        formData.append('phone', values.phone);
-        formData.append('carModel', values.carModel);
-        formData.append('description', values.description);
-        values.images.forEach(image => {
-          formData.append('images', image);
-        });
+    try {
+      const imageUrls: string[] = [];
 
-        await axios.post(
-          'https://autolinepanel-backend-production.up.railway.app/api/quotes',
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
-        );
+      for (const image of values.images) {
+        const fileExt = image.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
 
-        alert('Quote request submitted successfully!');
-        formik.resetForm();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
-        alert('Error submitting quote');
+        const { data, error } = await supabase.storage
+          .from('damage-images')
+          .upload(filePath, image);
+
+        if (data) {
+          console.log('Uploaded to:', data.path); // use it here
+        }
+
+        if (error) {
+          throw error;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('damage-images')
+          .getPublicUrl(filePath);
+
+        imageUrls.push(publicUrlData.publicUrl);
       }
+
+      // Submit only text data + URLs (no files)
+      await axios.post(
+        'https://autolinepanel-backend-production.up.railway.app/api/quotes',
+        {
+          name: values.name,
+          phone: values.phone,
+          carModel: values.carModel,
+          description: values.description,
+          images: imageUrls, // This matches Supabase DB: TEXT[]
+        }
+      );
+
+      alert('Quote request submitted successfully!');
+      formik.resetForm();
+    } catch (error) {
+      console.error(error);
+      alert('Error submitting quote');
     }
+  }
+
   });
 
   return (

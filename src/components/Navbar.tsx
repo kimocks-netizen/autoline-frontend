@@ -25,7 +25,7 @@ const Navbar = () => {
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-8">
               <NavItem to="/" label="Home" />
-              <NavItem to="/about" label="About Us" />
+              <NavItem to="/about" label="AboutUs" />
               <NavItem to="/services" label="Services" />
               <NavItem to="/gallery" label="Gallery" />
               <NavItem to="/admin" label="Admin" />
