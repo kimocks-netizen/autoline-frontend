@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Navbar from '../components/Navbar';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -52,6 +53,7 @@ const AdminLogin = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <Navbar />
       <div className="w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
         {/* Header now spans full card width */}
         <div className="w-full bg-gradient-to-r from-primary-blue to-dark-blue py-4 px-6 text-white">
