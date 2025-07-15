@@ -11,7 +11,7 @@ export interface Quote {
   car_model: string;
   status: QuoteStatus;
   images?: string[];
-  description?: string;
+  damage_description?: string;
 }
 
 const AdminDashboard = () => {
@@ -227,10 +227,10 @@ const AdminDashboard = () => {
             </button>
           </div>
           
-          {selectedQuote.description && (
+          {selectedQuote.damage_description && (
             <div className="mt-4">
               <h4 className="font-semibold text-gray-700">Damage Description:</h4>
-              <p className="text-gray-700 mt-1 whitespace-pre-wrap">{selectedQuote.description}</p>
+              <p className="text-gray-700 mt-1 whitespace-pre-wrap">{selectedQuote.damage_description}</p>
             </div>
           )}
 
