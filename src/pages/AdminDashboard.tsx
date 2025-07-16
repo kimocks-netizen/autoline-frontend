@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import AdminNavbar from '../components/AdminNavbar';
 type QuoteStatus = 'Pending' | 'Contacted' | 'Completed';
 type FilterStatus = QuoteStatus | 'All';
 
@@ -126,10 +126,6 @@ const AdminDashboard = () => {
       alert('Failed to update status. Please try again.');
     }
   };
-  const handleLogout = () => {
-    localStorage.removeItem('auth'); // Remove the JWT token
-    navigate('/'); // Redirect to homepage
-  };
 
   const openImageModal = (quote: Quote) => {
     setSelectedQuote(quote);
@@ -138,15 +134,10 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <AdminNavbar/>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-r from-primary-blue to-dark-blue px-6 py-4 text-white rounded-t-lg mb-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold">QUOTE REQUESTS</h1>
-          <button
-            onClick={handleLogout}
-            className="bg-gradient-to-r from-primary-red to-dark-red text-white py-2 px-6 rounded-md hover:opacity-80 transition-all duration-300 shadow-md hover:shadow-lg"
-          >
-            Logout
-          </button>
         </div>
        <div className="bg-white dark:bg-gray-900 shadow rounded-lg overflow-hidden">
         <div className="p-4">
