@@ -68,7 +68,7 @@ const Footer = () => {
               <address className="not-italic space-y-3">
                 <p>
                   <a
-                    href="https://share.google/tyS5jiaGyYCuHz4CM"
+                    href="https://maps.app.goo.gl/Xyk3tChq8AZpwdRm8"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center space-x-2 hover:text-primary-blue"
