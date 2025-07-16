@@ -20,6 +20,7 @@ const QuoteForm = ({ darkMode = false }) => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
+  const [showProgress, setShowProgress] = useState(false);
   // Handle drag events
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -134,25 +135,35 @@ const QuoteForm = ({ darkMode = false }) => {
         const imageUrls: string[] = [];
         const totalImages = values.images.length;
         
-        for (let i = 0; i < values.images.length; i++) {
-          const image = values.images[i];
-          const fileExt = image.name.split('.').pop();
-          const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
-          const filePath = `${fileName}`;
+ for (let i = 0; i < values.images.length; i++) {
+  const uploadStartTime = Date.now(); // Track when upload started
+  
+  const image = values.images[i];
+  const fileExt = image.name.split('.').pop();
+  const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+  const filePath = `${fileName}`;
 
-          const { error } = await supabase.storage
-            .from('damage-images')
-            .upload(filePath, image);
+  const { error } = await supabase.storage
+    .from('damage-images')
+    .upload(filePath, image);
 
-          if (error) throw error;
+  if (error) throw error;
 
-          const { data: publicUrlData } = supabase.storage
-            .from('damage-images')
-            .getPublicUrl(filePath);
+  const { data: publicUrlData } = supabase.storage
+    .from('damage-images')
+    .getPublicUrl(filePath);
 
-          imageUrls.push(publicUrlData.publicUrl);
-          setUploadProgress(Math.round(((i + 1) / totalImages) * 100));
-        }
+  imageUrls.push(publicUrlData.publicUrl);
+  
+  // Calculate progress
+  const progress = Math.round(((i + 1) / totalImages) * 100);
+  setUploadProgress(progress);
+  
+  // Show progress bar if upload takes longer than 2 seconds
+  if (Date.now() - uploadStartTime > 2000) {
+    setShowProgress(true);
+  }
+}
 
         await axios.post(
           'https://autolinepanel-backend-production.up.railway.app/api/quotes',
@@ -369,19 +380,19 @@ const QuoteForm = ({ darkMode = false }) => {
               </div>
             </div>
           )}  
-                 {uploadProgress > 0 && uploadProgress < 100 && (
-          <div className="mt-4">
-            <div className={`h-2 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-              <div
-                className="h-full rounded-full bg-blue-500"
-                style={{ width: `${uploadProgress}%` }}
-              ></div>
+          {showProgress && uploadProgress > 0 && uploadProgress < 100 && (
+            <div className="mt-4">
+              <div className={`h-2 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                <div
+                  className="h-full rounded-full bg-blue-500"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Uploading {uploadProgress}% complete...
+              </p>
             </div>
-            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Uploading {uploadProgress}% complete...
-            </p>
-          </div>
-        )}
+          )}
 
         {uploadError && (
           <div className="mt-2 text-red-500 text-sm">{uploadError}</div>
