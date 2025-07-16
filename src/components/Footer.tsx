@@ -1,4 +1,4 @@
-import { FaFacebookF, FaWhatsapp, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { FaFacebookF, FaWhatsapp, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 
 const Footer = () => {
   return (
@@ -65,34 +65,39 @@ const Footer = () => {
 
           <div>
             <h3 className="text-lg font-semibold mb-4 bg-gradient-to-r from-primary-red to-dark-red bg-clip-text text-transparent">Contact Us</h3>
-            <address className="not-italic space-y-1">
-              <p>
-                <a
-                  href="https://share.google/tyS5jiaGyYCuHz4CM"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-blue"
-                >
-                  121 Stormvoël Rd, Lindopark, Pretoria, 0186
-                </a>
-              </p>
-              <p>
-                <a
-                  href="tel:+27676308447"
-                  className="hover:text-primary-blue"
-                >
-                  +27 67 630 8447
-                </a>
-              </p>
-              <p>
-                <a
-                  href="mailto:autolinepanelshop@gmail.com"
-                  className="hover:text-primary-blue"
-                >
-                  autolinepanelshop@gmail.com
-                </a>
-              </p>
-            </address>
+              <address className="not-italic space-y-3">
+                <p>
+                  <a
+                    href="https://share.google/tyS5jiaGyYCuHz4CM"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-2 hover:text-primary-blue"
+                  >
+                    <FaMapMarkerAlt className="hover:text-primary-blue text-primary-red" />
+                    <span>121 Stormvoël Rd, Lindopark, Pretoria</span>
+                  </a>
+                </p>
+
+                <p>
+                  <a
+                    href="tel:+27676308447"
+                    className="flex items-center space-x-2 hover:text-primary-blue"
+                  >
+                    <FaPhoneAlt className="hover:text-primary-blue text-primary-red" />
+                    <span>+27 67 630 8447</span>
+                  </a>
+                </p>
+
+                <p>
+                  <a
+                    href="mailto:autolinepanelshop@gmail.com"
+                    className="flex items-center space-x-2 hover:text-primary-blue"
+                  >
+                    <FaEnvelope className="hover:text-primary-blue text-primary-red" />
+                    <span>autolinepanelshop@gmail.com</span>
+                  </a>
+                </p>
+              </address>
           </div>
         </div>
 
