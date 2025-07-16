@@ -1,9 +1,14 @@
-1. - update drage field show pics uploaded,
-   - retry not sucessful,
-   - 5 pics max and reroute to homepage on submission
-   - toaster sucess  -Done
+1. - ~~update drage field show pics uploaded~~,
+   - ~~retry not sucessful~~,
+   - ~~5 pics max and reroute to homepage on submission~~
+   - ~~toaster sucess~~  -Done 
+   - inprgress bar must show once uploading is now more than 2 seconds
 2. - Nav bar on admin
-3. - upload more pics on before and after plus discription
+3. - ~~upload more pics on before and after plus discription~~
+4. -  modal is big on mbile as the result x is not shown
+5. - ~~Admin sort by desc~~
+6. - contact us page, on admin add a bell button( for quotes and contact us messages)
+
 
 
 **TESTING:**

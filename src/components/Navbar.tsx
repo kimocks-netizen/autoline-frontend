@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import NavItem from './NavItem';
 import { Menu, X } from 'lucide-react';
+import LogoImage from '../images/logo.png';
+
 
 const Navbar = ({ darkMode = false }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,8 +50,8 @@ const Navbar = ({ darkMode = false }) => {
       <nav className={`fixed top-0 left-0 w-full ${navBackground} shadow-md z-50`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            {/* Logo */}
-            <Link to="/" className="flex-shrink-0 flex items-center">
+            <Link to="/" className="flex-shrink-0 flex items-center space-x-2">
+              <img src={LogoImage} alt="Autoline Logo" className="h-10 w-auto rounded-md" /> {/* 👈 Logo here */}
               <h1 className="text-xl font-bold">
                 <span className="bg-gradient-to-r from-primary-red to-dark-red bg-clip-text text-transparent">
                   AUTOLINE
@@ -57,7 +59,6 @@ const Navbar = ({ darkMode = false }) => {
                 <span className={darkMode ? "text-blue-300" : "text-primary-blue"}> PANEL SHOP</span>
               </h1>
             </Link>
-
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-8">
               <NavItem to="/" label="Home" darkMode={darkMode} />
@@ -93,10 +94,10 @@ const Navbar = ({ darkMode = false }) => {
       {/* Mobile Navigation */}
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop */} 
           <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setIsOpen(false)} />
           
-          {/* Mobile Nav Content */}
+          {/* Mobile Nav Content */} 
           <div 
             ref={mobileNavRef}
             className={`fixed top-16 left-0 right-0 ${mobileNavBackground} border-t shadow-lg z-50 transition-all duration-300`}

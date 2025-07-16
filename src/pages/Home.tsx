@@ -11,7 +11,7 @@ const Home = () => {
       
       <main className="flex-grow">
         {/* Hero Section */}
-        <div className="relative">
+        <div className="relative"> 
           <img src={HeroImage} alt="Panel Beating" className="w-full h-[70vh] object-cover" />
           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
             <div className="text-center text-white max-w-2xl px-4">
