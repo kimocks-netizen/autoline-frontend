@@ -83,7 +83,7 @@ const Footer = () => {
                     href="tel:+27676308447"
                     className="flex items-center space-x-2 hover:text-primary-blue"
                   >
-                    <FaPhoneAlt className="hover:text-primary-blue text-primary-red" />
+                    <FaPhoneAlt className="hover:text-primary-blue text-red-700" />
                     <span>+27 67 630 8447</span>
                   </a>
                 </p>
@@ -93,7 +93,7 @@ const Footer = () => {
                     href="mailto:autolinepanelshop@gmail.com"
                     className="flex items-center space-x-2 hover:text-primary-blue"
                   >
-                    <FaEnvelope className="hover:text-primary-blue text-primary-red" />
+                    <FaEnvelope className="hover:text-primary-blue text-dark-red" />
                     <span>autolinepanelshop@gmail.com</span>
                   </a>
                 </p>
