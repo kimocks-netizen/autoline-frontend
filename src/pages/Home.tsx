@@ -8,7 +8,6 @@ const Home = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
       <main className="flex-grow">
         {/* Hero Section */}
         <div className="relative"> 
@@ -39,7 +38,7 @@ const Home = () => {
               description="When a bumper bashing occurs, who are you going to call? That's right, Autoline Panel Shop. Your number one automobile body repair company Pretoria has ever seen."
               image={Bumper} details={''}            />
             {/* Add other service cards */}
-                  <ServiceCard 
+            <ServiceCard 
               title="Bumper & Plastic Repair"
               description="When a bumper bashing occurs, who are you going to call? That's right, Autoline Panel Shop. Your number one automobile body repair company Pretoria has ever seen."
               image={Bumper} details={''}            />
