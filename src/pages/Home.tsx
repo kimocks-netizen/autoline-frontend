@@ -21,7 +21,7 @@ const Home = () => {
                 href="/request-quote" 
                 className="bg-gradient-to-r from-primary-red to-dark-red text-white px-8 py-3 rounded-md text-lg font-medium hover:opacity-90 transition"
               >
-                EMERGENCY SERVICE
+                REQUEST A QUOTE
               </a>
             </div>
           </div>

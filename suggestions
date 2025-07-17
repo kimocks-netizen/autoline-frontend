@@ -8,7 +8,7 @@
 4. -  modal is big on mbile as the result x is not shown
 5. - ~~Admin sort by desc~~
 6. - contact us page, on admin add a bell button( for quotes and contact us messages)
-
+7. - create layout class and avoid code repetition, add footer and nav in the app.tsx and exclude it from admin routes, and footer too
 
 
 **TESTING:**
