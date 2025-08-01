@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../components/AdminNavbar';
+import InvoiceModal from '../components/InvoiceModal';
+import InvoicePDF from '../components/InvoicePDF';
 type QuoteStatus = 'Pending' | 'Contacted' | 'Completed';
 type FilterStatus = QuoteStatus | 'All';
 
@@ -21,6 +23,10 @@ const AdminDashboard = () => {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [isInvoicePDFOpen, setIsInvoicePDFOpen] = useState(false);
+  const [selectedQuoteForInvoice, setSelectedQuoteForInvoice] = useState<Quote | null>(null);
+  const [currentInvoice, setCurrentInvoice] = useState<any>(null);
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const quotesPerPage = 5;
@@ -132,6 +138,16 @@ const AdminDashboard = () => {
     setIsModalOpen(true);
   };
 
+  const openInvoiceModal = (quote: Quote) => {
+    setSelectedQuoteForInvoice(quote);
+    setIsInvoiceModalOpen(true);
+  };
+
+  const handleInvoiceCreated = () => {
+    // Refresh quotes or handle as needed
+    window.location.reload();
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <AdminNavbar/>
@@ -185,6 +201,9 @@ const AdminDashboard = () => {
                     Images
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Invoice
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -228,16 +247,18 @@ const AdminDashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <button
+                        onClick={() => openInvoiceModal(quote)}
+                        className="text-green-600 hover:text-green-800 underline"
+                      >
+                        Generate
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button
                         onClick={() => window.open(`https://wa.me/${quote.phone}`, '_blank')}
                         className="text-green-600 hover:text-green-800 mr-3"
                       >
                         WhatsApp
-                      </button>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(quote.phone)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        Copy Number
                       </button>
                     </td>
                   </tr>
@@ -245,7 +266,7 @@ const AdminDashboard = () => {
                 {paginatedQuotes.length === 0 && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="text-center py-4 text-gray-500 dark:text-gray-400"
                     >
                       No quotes found.
@@ -254,7 +275,7 @@ const AdminDashboard = () => {
                 )}
                 {quotes.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="text-center py-4 text-gray-500">
+                    <td colSpan={7} className="text-center py-4 text-gray-500">
                       No quotes found.
                     </td>
                   </tr>
@@ -286,6 +307,27 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+      
+      {/* Invoice Modal */}
+      {isInvoiceModalOpen && selectedQuoteForInvoice && (
+        <InvoiceModal
+          quote={selectedQuoteForInvoice}
+          isOpen={isInvoiceModalOpen}
+          onClose={() => setIsInvoiceModalOpen(false)}
+          onInvoiceCreated={handleInvoiceCreated}
+          setCurrentInvoice={setCurrentInvoice}
+          setIsInvoicePDFOpen={setIsInvoicePDFOpen}
+        />
+      )}
+
+      {/* Invoice PDF Modal */}
+      {isInvoicePDFOpen && currentInvoice && (
+        <InvoicePDF
+          invoice={currentInvoice}
+          onClose={() => setIsInvoicePDFOpen(false)}
+        />
+      )}
+
       {/* Image Modal */}
     {isModalOpen && selectedQuote && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

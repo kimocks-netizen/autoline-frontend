@@ -6,6 +6,7 @@ import Gallery from './pages/Gallery';
 import RequestQuote from './pages/RequestQuote';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import InvoiceManagement from './pages/InvoiceManagement';
 import GalleryEdit from './pages/GalleryEdit';
 //import FloatingWhatsAppButton from './components/FloatingWhatsAppButton';
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/request-quote" element={<RequestQuote />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/invoices" element={<InvoiceManagement />} />
           <Route path="/admin/gallery-edit" element={<GalleryEdit />} />
         </Routes>
         {/*<FloatingWhatsAppButton />*/}
