@@ -102,7 +102,7 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
         {/* Scrollable content area */}
         <div className="flex-1 overflow-auto">
           {/* Hidden printable content */}
-          <div ref={pdfRef} className="p-4 sm:p-6 bg-white">
+          <div ref={pdfRef} className="p-4 sm:p-6 bg-white" style={{ minWidth: '800px' }}>
             <div className="max-w-4xl mx-auto">
               {/* Header */}
               <div className="text-center mb-6 sm:mb-8 border-b-2 border-gray-300 pb-4 sm:pb-6">
@@ -117,9 +117,9 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
               </div>
 
               {/* Invoice Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8" style={{ minWidth: '600px' }}>
                 <div className="text-left">
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-4 text-left">Invoice To:</h2>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-4 text-left">{invoice.document_type === 'quote' ? 'Quote To:' : 'Invoice To:'}</h2>
                   <div className="text-gray-700 text-left">
                     <p className="font-semibold text-base sm:text-lg text-left">{invoice.customer_name}</p>
                     <p className="text-sm sm:text-base text-left">{invoice.customer_phone}</p>
@@ -130,12 +130,14 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
                   </div>
                 </div>
                 <div className="text-left md:text-right">
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-4">Invoice Details:</h2>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-4">{invoice.document_type === 'quote' ? 'Quote Details:' : 'Invoice Details:'}</h2>
                   <div className="text-gray-700 text-sm sm:text-base">
-                    <p><strong>Invoice Number:</strong> {invoice.invoice_number}</p>
+                    <p><strong>{invoice.document_type === 'quote' ? 'Quote Number:' : 'Invoice Number:'}</strong> {invoice.invoice_number}</p>
                     <p><strong>Date:</strong> {formatDate(invoice.invoice_date)}</p>
                     <p><strong>Repair Type:</strong> {invoice.repair_type === 'Multiple' ? 'Multiple' : invoice.repair_type}</p>
-                    <p><strong>Status:</strong> {invoice.status.toUpperCase()}</p>
+                    {invoice.document_type !== 'quote' && (
+                      <p><strong>Status:</strong> {invoice.status.toUpperCase()}</p>
+                    )}
                   </div>
                 </div>
               </div>

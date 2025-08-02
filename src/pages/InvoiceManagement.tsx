@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../components/AdminNavbar';
 import InvoicePDF from '../components/InvoicePDF';
 import NewInvoiceModal from '../components/NewInvoiceModal';
+import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 
 interface Invoice {
   id: string;
@@ -19,6 +20,7 @@ interface Invoice {
   vat_amount: number;
   total_amount: number;
   status: string;
+  document_type: 'invoice' | 'quote';
   created_at: string;
 }
 
@@ -27,6 +29,9 @@ const InvoiceManagement = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isPDFOpen, setIsPDFOpen] = useState(false);
   const [isNewInvoiceModalOpen, setIsNewInvoiceModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteItem, setDeleteItem] = useState<{ id: string; type: 'invoice' | 'quote'; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const invoicesPerPage = 10;
@@ -126,6 +131,117 @@ const InvoiceManagement = () => {
     }
   };
 
+  const handleConvertDocument = async (id: string, currentType: 'invoice' | 'quote') => {
+    const authStr = localStorage.getItem('auth');
+    if (!authStr) return alert('Not authenticated');
+
+    let token: string;
+    try {
+      const auth = JSON.parse(authStr);
+      token = auth.token;
+      if (!token) throw new Error('No token found');
+    } catch {
+      alert('Invalid authentication');
+      return;
+    }
+
+    const newType = currentType === 'invoice' ? 'quote' : 'invoice';
+    const confirmMessage = `Are you sure you want to convert this ${currentType} to a ${newType}?`;
+    
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${id}/convert`,
+        { newType },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.status === 'success') {
+        const message = response.data.data && response.data.data.id !== id 
+          ? `${currentType} converted to ${newType} successfully!` 
+          : `This ${currentType} has already been converted to a ${newType}.`;
+        alert(message);
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error converting document:', error);
+      alert('Failed to convert document. Please try again.');
+    }
+  };
+
+  const handleDeleteClick = (invoice: Invoice) => {
+    setDeleteItem({
+      id: invoice.id,
+      type: invoice.document_type,
+      name: `${invoice.document_type === 'invoice' ? 'Invoice' : 'Quote'} ${invoice.invoice_number}`
+    });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteItem) return;
+
+    const authStr = localStorage.getItem('auth');
+    if (!authStr) return alert('Not authenticated');
+
+    let token: string;
+    try {
+      const auth = JSON.parse(authStr);
+      token = auth.token;
+      if (!token) throw new Error('No token found');
+    } catch {
+      alert('Invalid authentication');
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      // Optimistic UI update
+      setInvoices(prevInvoices =>
+        prevInvoices.filter(invoice => invoice.id !== deleteItem.id)
+      );
+
+      const response = await axios.delete(
+        `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${deleteItem.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.status === 'success') {
+        // Close modal without showing success message
+        setIsDeleteModalOpen(false);
+        setDeleteItem(null);
+      } else {
+        // Revert optimistic update on error
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      // Revert optimistic update on error
+      window.location.reload();
+      alert('Failed to delete document. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteItem(null);
+    setIsDeleting(false);
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-ZA', {
       style: 'currency',
@@ -142,20 +258,20 @@ const InvoiceManagement = () => {
       <AdminNavbar/>
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-r from-primary-blue to-dark-blue px-6 py-4 text-white rounded-t-lg mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">INVOICE MANAGEMENT</h1>
+          <h1 className="text-2xl font-bold">INVOICE & QUOTE MANAGEMENT</h1>
         </div>
         
         <div className="bg-white dark:bg-gray-900 shadow rounded-lg overflow-hidden">
           <div className="p-4">
             <div className="mb-4 flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                Generated Invoices ({invoices.length})
+                Generated Documents ({invoices.length})
               </h2>
               <button
                 onClick={() => setIsNewInvoiceModalOpen(true)}
                 className="bg-gradient-to-r from-green-500 to-green-700 text-white px-4 py-2 rounded-md hover:from-green-600 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg"
               >
-                New Invoice
+                New Document
               </button>
             </div>
           </div>
@@ -165,7 +281,10 @@ const InvoiceManagement = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Invoice #
+                    Document #
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Customer
@@ -197,6 +316,15 @@ const InvoiceManagement = () => {
                       {invoice.invoice_number}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        invoice.document_type === 'quote' 
+                          ? 'bg-purple-100 text-purple-800' 
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div>
                         <div className="font-medium text-gray-900">{invoice.customer_name}</div>
                         <div className="text-gray-500">{invoice.customer_phone}</div>
@@ -220,45 +348,63 @@ const InvoiceManagement = () => {
                       {formatCurrency(invoice.total_amount)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <select
-                        value={invoice.status}
-                        onChange={(e) => handleStatusChange(invoice.id, e.target.value)}
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          invoice.status === 'paid'
-                            ? 'bg-green-100 text-green-800'
-                            : invoice.status === 'sent'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        <option value="draft">Draft</option>
-                        <option value="sent">Sent</option>
-                        <option value="paid">Paid</option>
-                      </select>
+                      {invoice.document_type === 'invoice' ? (
+                        <select
+                          value={invoice.status}
+                          onChange={(e) => handleStatusChange(invoice.id, e.target.value)}
+                          className={`px-2 py-1 rounded text-xs font-medium ${
+                            invoice.status === 'paid'
+                              ? 'bg-green-100 text-green-800'
+                              : invoice.status === 'sent'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          <option value="draft">Draft</option>
+                          <option value="sent">Sent</option>
+                          <option value="paid">Paid</option>
+                        </select>
+                      ) : (
+                        <span className="text-gray-400 text-xs">N/A</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button
-                        onClick={() => openPDFModal(invoice)}
-                        className="text-blue-600 hover:text-blue-800 underline mr-3"
-                      >
-                        View PDF
-                      </button>
-                      <button
-                        onClick={() => window.open(`https://wa.me/${invoice.customer_phone}`, '_blank')}
-                        className="text-green-600 hover:text-green-800"
-                      >
-                        WhatsApp
-                      </button>
+                      <div className="flex flex-col space-y-1">
+                        <button
+                          onClick={() => openPDFModal(invoice)}
+                          className="text-blue-600 hover:text-blue-800 underline text-xs"
+                        >
+                          View PDF
+                        </button>
+                        <button
+                          onClick={() => handleConvertDocument(invoice.id, invoice.document_type)}
+                          className="text-purple-600 hover:text-purple-800 underline text-xs"
+                        >
+                          Convert to {invoice.document_type === 'invoice' ? 'Quote' : 'Invoice'}
+                        </button>
+                        <button
+                          onClick={() => window.open(`https://wa.me/${invoice.customer_phone}`, '_blank')}
+                          className="text-green-600 hover:text-green-800 text-xs"
+                        >
+                          WhatsApp
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(invoice)}
+                          className="text-red-600 hover:text-red-800 underline text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
                 {paginatedInvoices.length === 0 && (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       className="text-center py-4 text-gray-500 dark:text-gray-400"
                     >
-                      No invoices found.
+                      No documents found.
                     </td>
                   </tr>
                 )}
@@ -295,7 +441,7 @@ const InvoiceManagement = () => {
         <NewInvoiceModal
           isOpen={isNewInvoiceModalOpen}
           onClose={() => setIsNewInvoiceModalOpen(false)}
-          onInvoiceCreated={() => {
+          onDocumentCreated={() => {
             setIsNewInvoiceModalOpen(false);
             window.location.reload();
           }}
@@ -309,6 +455,19 @@ const InvoiceManagement = () => {
         <InvoicePDF
           invoice={selectedInvoice}
           onClose={() => setIsPDFOpen(false)}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && deleteItem && (
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Confirmation"
+          message={`Are you sure you want to delete this ${deleteItem.type}?`}
+          itemName={deleteItem.name}
+          isLoading={isDeleting}
         />
       )}
     </div>

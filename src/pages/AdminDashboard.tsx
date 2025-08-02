@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../components/AdminNavbar';
-import InvoiceModal from '../components/InvoiceModal';
+import NewInvoiceModal from '../components/NewInvoiceModal';
 import InvoicePDF from '../components/InvoicePDF';
 type QuoteStatus = 'Pending' | 'Contacted' | 'Completed';
 type FilterStatus = QuoteStatus | 'All';
@@ -310,11 +310,11 @@ const AdminDashboard = () => {
       
       {/* Invoice Modal */}
       {isInvoiceModalOpen && selectedQuoteForInvoice && (
-        <InvoiceModal
+        <NewInvoiceModal
           quote={selectedQuoteForInvoice}
           isOpen={isInvoiceModalOpen}
           onClose={() => setIsInvoiceModalOpen(false)}
-          onInvoiceCreated={handleInvoiceCreated}
+          onDocumentCreated={handleInvoiceCreated}
           setCurrentInvoice={setCurrentInvoice}
           setIsInvoicePDFOpen={setIsInvoicePDFOpen}
         />

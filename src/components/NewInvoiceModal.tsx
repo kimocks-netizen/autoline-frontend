@@ -1,21 +1,41 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+interface Quote {
+  id: string;
+  name: string;
+  phone: string;
+  car_model: string;
+  status: string;
+  images?: string[];
+  damage_description?: string;
+}
+
 interface NewInvoiceModalProps {
+  quote?: Quote;
   isOpen: boolean;
   onClose: () => void;
-  onInvoiceCreated: () => void;
+  onDocumentCreated: () => void;
   setCurrentInvoice: (invoice: any) => void;
   setIsInvoicePDFOpen: (open: boolean) => void;
 }
 
-const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ isOpen, onClose, onInvoiceCreated, setCurrentInvoice, setIsInvoicePDFOpen }) => {
+const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ 
+  quote, 
+  isOpen, 
+  onClose, 
+  onDocumentCreated, 
+  setCurrentInvoice, 
+  setIsInvoicePDFOpen 
+}) => {
+  const [documentType, setDocumentType] = useState<'invoice' | 'quote'>('invoice');
   const [formData, setFormData] = useState({
-    customer_name: '',
-    customer_phone: '',
-    car_model: '',
+    customer_name: quote?.name || '',
+    customer_phone: quote?.phone || '',
+    car_model: quote?.car_model || '',
     vehicle_reg_number: '',
-    description: '',
+    repair_type: '',
+    description: quote?.damage_description || '',
     invoice_date: new Date().toISOString().split('T')[0],
     total_amount: ''
   });
@@ -77,12 +97,13 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ isOpen, onClose, onIn
       const response = await axios.post(
         'https://autolinepanel-backend-production.up.railway.app/api/admin/invoices',
         {
-          quote_id: null, // No quote ID for new invoices
+          quote_id: quote?.id,
           ...formData,
           repair_type: repairItems.length > 2 ? 'Multiple' : repairItems[0].repair_type,
           description: repairItems.map(item => `${item.repair_type}: ${item.description}`).join('; '),
           total_amount: calculateTotal(),
-          repair_items: repairItems
+          repair_items: repairItems,
+          document_type: documentType
         },
         {
           headers: {
@@ -92,16 +113,16 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ isOpen, onClose, onIn
       );
 
       if (response.data.status === 'success') {
-        alert('Invoice created successfully!');
-        // Show the generated invoice
+        alert(`${documentType === 'quote' ? 'Quote' : 'Invoice'} created successfully!`);
+        // Show the generated document
         setCurrentInvoice(response.data.data);
         setIsInvoicePDFOpen(true);
-        onInvoiceCreated();
+        onDocumentCreated();
         onClose();
       }
     } catch (error) {
-      console.error('Error creating invoice:', error);
-      alert('Failed to create invoice. Please try again.');
+      console.error('Error creating document:', error);
+      alert(`Failed to create ${documentType}. Please try again.`);
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +135,9 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ isOpen, onClose, onIn
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Create New Invoice</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Generate {documentType === 'quote' ? 'Quote' : 'Invoice'}
+            </h2>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700 text-2xl"
@@ -124,6 +147,22 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ isOpen, onClose, onIn
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Document Type Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Document Type *
+              </label>
+              <select
+                value={documentType}
+                onChange={(e) => setDocumentType(e.target.value as 'invoice' | 'quote')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="invoice">Invoice</option>
+                <option value="quote">Quote</option>
+              </select>
+            </div>
+
             {/* Customer Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -186,7 +225,7 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ isOpen, onClose, onIn
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Invoice Date *
+                {documentType === 'quote' ? 'Quote' : 'Invoice'} Date *
               </label>
               <input
                 type="date"
@@ -236,7 +275,6 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ isOpen, onClose, onIn
                         <option value="Rust Repair">Rust Repair</option>
                         <option value="Accident Damage">Accident Damage</option>
                         <option value="Other">Other</option>
-                        <option value="Labour">Labour</option>
                       </select>
                     </div>
                     
@@ -304,9 +342,9 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ isOpen, onClose, onIn
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {isLoading ? 'Creating...' : 'Create Invoice'}
+                {isLoading ? 'Creating...' : `Generate ${documentType === 'quote' ? 'Quote' : 'Invoice'}`}
               </button>
             </div>
           </form>
