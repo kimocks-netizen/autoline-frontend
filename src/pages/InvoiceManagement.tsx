@@ -6,6 +6,7 @@ import InvoicePDF from '../components/InvoicePDF';
 import NewInvoiceModal from '../components/NewInvoiceModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import ConversionConfirmationModal from '../components/ConversionConfirmationModal';
+import { FaEllipsisV, FaEye, FaEdit, FaExchangeAlt, FaWhatsapp, FaTrash } from 'react-icons/fa';
 
 interface Invoice {
   id: string;
@@ -23,6 +24,7 @@ interface Invoice {
   status: string;
   document_type: 'invoice' | 'quote';
   created_at: string;
+  repair_items?: { repair_type: string; description: string; amount: string }[];
 }
 
 const InvoiceManagement = () => {
@@ -39,6 +41,9 @@ const InvoiceManagement = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const invoicesPerPage = 10;
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 
   // Paginated
   const totalPages = Math.ceil(invoices.length / invoicesPerPage);
@@ -82,6 +87,19 @@ const InvoiceManagement = () => {
 
     fetchInvoices();
   }, [navigate]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownOpen && !(event.target as Element).closest('.dropdown-container')) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   const openPDFModal = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
@@ -308,6 +326,37 @@ const InvoiceManagement = () => {
     return new Date(dateString).toLocaleDateString('en-ZA');
   };
 
+  const handleEditClick = (invoice: Invoice) => {
+    setEditingInvoice(invoice);
+    setIsEditModalOpen(true);
+    setDropdownOpen(null);
+  };
+
+  const handleDropdownToggle = (invoiceId: string) => {
+    setDropdownOpen(dropdownOpen === invoiceId ? null : invoiceId);
+  };
+
+  const handleActionClick = (action: string, invoice: Invoice) => {
+    setDropdownOpen(null);
+    switch (action) {
+      case 'view':
+        openPDFModal(invoice);
+        break;
+      case 'edit':
+        handleEditClick(invoice);
+        break;
+      case 'convert':
+        handleConvertClick(invoice);
+        break;
+      case 'whatsapp':
+        handleWhatsAppShare(invoice);
+        break;
+      case 'delete':
+        handleDeleteClick(invoice);
+        break;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <AdminNavbar/>
@@ -424,31 +473,55 @@ const InvoiceManagement = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex flex-col space-y-1">
+                      <div className="relative dropdown-container">
                         <button
-                          onClick={() => openPDFModal(invoice)}
-                          className="text-blue-600 hover:text-blue-800 underline text-xs"
+                          onClick={() => handleDropdownToggle(invoice.id)}
+                          className="text-gray-400 hover:text-gray-600 p-1 rounded"
                         >
-                          View PDF
+                          <FaEllipsisV className="w-4 h-4" />
                         </button>
-                        <button
-                          onClick={() => handleConvertClick(invoice)}
-                          className="text-purple-600 hover:text-purple-800 underline text-xs"
-                        >
-                          Convert to {invoice.document_type === 'invoice' ? 'Quote' : 'Invoice'}
-                        </button>
-                        <button
-                          onClick={() => handleWhatsAppShare(invoice)}
-                          className="text-green-600 hover:text-green-800 text-xs"
-                        >
-                          WhatsApp
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(invoice)}
-                          className="text-red-600 hover:text-red-800 underline text-xs"
-                        >
-                          Delete
-                        </button>
+                        
+                        {dropdownOpen === invoice.id && (
+                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200">
+                            <div className="py-1">
+                              <button
+                                onClick={() => handleActionClick('view', invoice)}
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                <FaEye className="w-4 h-4 mr-2" />
+                                View PDF
+                              </button>
+                              <button
+                                onClick={() => handleActionClick('edit', invoice)}
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                <FaEdit className="w-4 h-4 mr-2" />
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleActionClick('convert', invoice)}
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                <FaExchangeAlt className="w-4 h-4 mr-2" />
+                                Convert to {invoice.document_type === 'invoice' ? 'Quote' : 'Invoice'}
+                              </button>
+                              <button
+                                onClick={() => handleActionClick('whatsapp', invoice)}
+                                className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                <FaWhatsapp className="w-4 h-4 mr-2" />
+                                WhatsApp
+                              </button>
+                              <button
+                                onClick={() => handleActionClick('delete', invoice)}
+                                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                              >
+                                <FaTrash className="w-4 h-4 mr-2" />
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -510,6 +583,26 @@ const InvoiceManagement = () => {
         <InvoicePDF
           invoice={selectedInvoice}
           onClose={() => setIsPDFOpen(false)}
+        />
+      )}
+
+      {/* Edit Invoice Modal */}
+      {isEditModalOpen && editingInvoice && (
+        <NewInvoiceModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingInvoice(null);
+          }}
+          onDocumentCreated={() => {
+            setIsEditModalOpen(false);
+            setEditingInvoice(null);
+            window.location.reload();
+          }}
+          setCurrentInvoice={setSelectedInvoice}
+          setIsInvoicePDFOpen={setIsPDFOpen}
+          editInvoice={editingInvoice}
+          isEditing={true}
         />
       )}
 

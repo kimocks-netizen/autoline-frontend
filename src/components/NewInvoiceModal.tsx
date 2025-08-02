@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface Quote {
@@ -11,6 +11,25 @@ interface Quote {
   damage_description?: string;
 }
 
+interface Invoice {
+  id: string;
+  invoice_number: string;
+  customer_name: string;
+  customer_phone: string;
+  car_model: string;
+  vehicle_reg_number?: string;
+  repair_type: string;
+  description?: string;
+  invoice_date: string;
+  subtotal: number;
+  vat_amount: number;
+  total_amount: number;
+  status: string;
+  document_type: 'invoice' | 'quote';
+  created_at: string;
+  repair_items?: { repair_type: string; description: string; amount: string }[];
+}
+
 interface NewInvoiceModalProps {
   quote?: Quote;
   isOpen: boolean;
@@ -18,6 +37,8 @@ interface NewInvoiceModalProps {
   onDocumentCreated: () => void;
   setCurrentInvoice: (invoice: any) => void;
   setIsInvoicePDFOpen: (open: boolean) => void;
+  editInvoice?: Invoice; // Add this
+  isEditing?: boolean; // Add this
 }
 
 const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({ 
@@ -26,26 +47,75 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({
   onClose, 
   onDocumentCreated, 
   setCurrentInvoice, 
-  setIsInvoicePDFOpen 
+  setIsInvoicePDFOpen,
+  editInvoice,
+  isEditing = false
 }) => {
-  const [documentType, setDocumentType] = useState<'invoice' | 'quote'>('invoice');
+  const [documentType, setDocumentType] = useState<'invoice' | 'quote'>(editInvoice?.document_type || 'invoice');
   const [formData, setFormData] = useState({
-    customer_name: quote?.name || '',
-    customer_phone: quote?.phone || '',
-    car_model: quote?.car_model || '',
-    vehicle_reg_number: '',
-    repair_type: '',
-    description: quote?.damage_description || '',
-    invoice_date: new Date().toISOString().split('T')[0],
-    total_amount: ''
+    customer_name: editInvoice?.customer_name || quote?.name || '',
+    customer_phone: editInvoice?.customer_phone || quote?.phone || '',
+    car_model: editInvoice?.car_model || quote?.car_model || '',
+    vehicle_reg_number: editInvoice?.vehicle_reg_number || '',
+    repair_type: editInvoice?.repair_type || '',
+    description: editInvoice?.description || quote?.damage_description || '',
+    invoice_date: editInvoice?.invoice_date || new Date().toISOString().split('T')[0],
+    total_amount: editInvoice?.total_amount?.toString() || ''
   });
 
-  const [repairItems, setRepairItems] = useState([
-    { repair_type: '', description: '', amount: '' },
-    { repair_type: 'Labour', description: 'Labour', amount: '' }
-  ]);
+  // Initialize repair items from editInvoice if editing
+  const [repairItems, setRepairItems] = useState(() => {
+    if (editInvoice && editInvoice.repair_items && editInvoice.repair_items.length > 0) {
+      return editInvoice.repair_items;
+    }
+    return [
+      { repair_type: '', description: '', amount: '' },
+      { repair_type: 'Labour', description: 'Labour', amount: '' }
+    ];
+  });
+
+  // Reset form when editInvoice changes
+  useEffect(() => {
+    if (editInvoice && isEditing) {
+      setDocumentType(editInvoice.document_type);
+      setFormData({
+        customer_name: editInvoice.customer_name,
+        customer_phone: editInvoice.customer_phone,
+        car_model: editInvoice.car_model,
+        vehicle_reg_number: editInvoice.vehicle_reg_number || '',
+        repair_type: editInvoice.repair_type,
+        description: editInvoice.description || '',
+        invoice_date: editInvoice.invoice_date,
+        total_amount: editInvoice.total_amount.toString()
+      });
+      
+      // Properly populate repair items
+      if (editInvoice.repair_items && editInvoice.repair_items.length > 0) {
+        // Ensure we have at least 2 items (one regular + Labour)
+        const items = [...editInvoice.repair_items];
+        if (items.length === 1) {
+          // If only one item, add Labour item
+          items.push({ repair_type: 'Labour', description: 'Labour', amount: '' });
+        } else if (items.length === 0) {
+          // If no items, add default items
+          items.push({ repair_type: '', description: '', amount: '' });
+          items.push({ repair_type: 'Labour', description: 'Labour', amount: '' });
+        }
+        setRepairItems(items);
+      } else {
+        // Default items if no repair_items
+        setRepairItems([
+          { repair_type: '', description: '', amount: '' },
+          { repair_type: 'Labour', description: 'Labour', amount: '' }
+        ]);
+      }
+    }
+  }, [editInvoice, isEditing]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -87,15 +157,22 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({
     try {
       const authStr = localStorage.getItem('auth');
       if (!authStr) {
-        alert('Not authenticated');
+        setErrorMessage('Not authenticated');
+        setShowErrorModal(true);
         return;
       }
 
       const auth = JSON.parse(authStr);
       const token = auth.token;
 
-      const response = await axios.post(
-        'https://autolinepanel-backend-production.up.railway.app/api/admin/invoices',
+      const endpoint = isEditing 
+        ? `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${editInvoice?.id}`
+        : 'https://autolinepanel-backend-production.up.railway.app/api/admin/invoices';
+
+      const method = isEditing ? 'put' : 'post';
+
+      const response = await axios[method](
+        endpoint,
         {
           quote_id: quote?.id,
           ...formData,
@@ -113,16 +190,16 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({
       );
 
       if (response.data.status === 'success') {
-        alert(`${documentType === 'quote' ? 'Quote' : 'Invoice'} created successfully!`);
-        // Show the generated document
+        setShowSuccessModal(true);
         setCurrentInvoice(response.data.data);
         setIsInvoicePDFOpen(true);
         onDocumentCreated();
         onClose();
       }
     } catch (error) {
-      console.error('Error creating document:', error);
-      alert(`Failed to create ${documentType}. Please try again.`);
+      console.error(`Error ${isEditing ? 'updating' : 'creating'} document:`, error);
+      setErrorMessage(`Failed to ${isEditing ? 'update' : 'create'} ${documentType}. Please try again.`);
+      setShowErrorModal(true);
     } finally {
       setIsLoading(false);
     }
