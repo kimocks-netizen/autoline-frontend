@@ -197,58 +197,15 @@ const InvoiceManagement = () => {
     setIsConverting(false);
   };
 
+  const formatRepairType = (repairType: string) => {
+    if (!repairType || repairType === 'Multiple') {
+      return 'Multiple Repairs';
+    }
+    return repairType;
+  };
+
   const handleWhatsAppShare = async (invoice: Invoice) => {
     try {
-      // Generate PDF blob
-      const pdfRef = document.createElement('div');
-      pdfRef.innerHTML = `
-        <div style="padding: 20px; font-family: Arial, sans-serif;">
-          <h1 style="color: #333; text-align: center; margin-bottom: 30px;">
-            ${invoice.document_type === 'quote' ? 'QUOTE' : 'INVOICE'}
-          </h1>
-          <div style="margin-bottom: 20px;">
-            <strong>Document Number:</strong> ${invoice.invoice_number}
-          </div>
-          <div style="margin-bottom: 20px;">
-            <strong>Customer:</strong> ${invoice.customer_name}
-          </div>
-          <div style="margin-bottom: 20px;">
-            <strong>Phone:</strong> ${invoice.customer_phone}
-          </div>
-          <div style="margin-bottom: 20px;">
-            <strong>Vehicle:</strong> ${invoice.car_model}
-            ${invoice.vehicle_reg_number ? ` (${invoice.vehicle_reg_number})` : ''}
-          </div>
-          <div style="margin-bottom: 20px;">
-            <strong>Repair Type:</strong> ${invoice.repair_type}
-          </div>
-          <div style="margin-bottom: 20px;">
-            <strong>Date:</strong> ${new Date(invoice.invoice_date).toLocaleDateString('en-ZA')}
-          </div>
-          <div style="margin-bottom: 20px;">
-            <strong>Total Amount:</strong> ${new Intl.NumberFormat('en-ZA', {
-              style: 'currency',
-              currency: 'ZAR',
-            }).format(invoice.total_amount)}
-          </div>
-        </div>
-      `;
-
-      // Generate PDF using html2pdf
-      const { default: html2pdf } = await import('html2pdf.js');
-      const opt = {
-        margin: 0.5,
-        filename: `${invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}-${invoice.invoice_number}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-
-      const pdfBlob = await html2pdf().from(pdfRef).set(opt).toPdf().get('pdf').then((pdf: any) => pdf.output('blob'));
-      
-      // Create a temporary URL for the PDF
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      
       // Format phone number for WhatsApp (remove spaces and ensure it starts with country code)
       let phoneNumber = invoice.customer_phone.replace(/\s+/g, '');
       if (!phoneNumber.startsWith('+')) {
@@ -256,32 +213,21 @@ const InvoiceManagement = () => {
         phoneNumber = '+27' + phoneNumber.replace(/^0/, '');
       }
       
-      // Create WhatsApp message with document
-      const message = `Hi ${invoice.customer_name}, please find attached your ${invoice.document_type === 'quote' ? 'quote' : 'invoice'} for ${invoice.repair_type} on your ${invoice.car_model}.`;
+      // Create WhatsApp message
+      const message = `Hi ${invoice.customer_name}, please find your ${invoice.document_type === 'quote' ? 'quote' : 'invoice'} for ${formatRepairType(invoice.repair_type)} on your ${invoice.car_model}. Document Number: ${invoice.invoice_number}. Total Amount: ${new Intl.NumberFormat('en-ZA', {
+        style: 'currency',
+        currency: 'ZAR',
+      }).format(invoice.total_amount)}`;
       
-      // For WhatsApp Web API, we need to encode the message and create the URL
+      // Encode message and create WhatsApp URL
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
       
       // Open WhatsApp with the message
       window.open(whatsappUrl, '_blank');
       
-      // Note: WhatsApp Web doesn't support direct file attachment via URL
-      // The user will need to manually attach the PDF after opening WhatsApp
-      // We can provide instructions or download the PDF for them
-      
-      // Download the PDF for the user to manually attach
-      const link = document.createElement('a');
-      link.href = pdfUrl;
-      link.download = `${invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}-${invoice.invoice_number}.pdf`;
-      link.click();
-      
-      // Clean up the URL
-      setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
-      
     } catch (error) {
-      console.error('Error generating PDF for WhatsApp:', error);
-      alert('Error generating PDF. Please try again.');
+      console.error('Error opening WhatsApp:', error);
     }
   };
 

@@ -274,6 +274,7 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({
                         <option value="Scratch Repair">Scratch Repair</option>
                         <option value="Rust Repair">Rust Repair</option>
                         <option value="Accident Damage">Accident Damage</option>
+                        <option value="Labour">Labour</option>
                         <option value="Other">Other</option>
                       </select>
                     </div>
