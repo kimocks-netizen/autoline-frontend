@@ -29,10 +29,10 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
   const handleDownloadPdf = () => {
     if (pdfRef.current) {
       const opt = {
-        margin: 0.5,
-        filename: `Invoice-${invoice.invoice_number}.pdf`,
+        margin: [0.3, 0.3, 0.3, 0.3] as [number, number, number, number],
+        filename: `${invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}-${invoice.invoice_number}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { scale: 1.5, useCORS: true, allowTaint: true },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
@@ -43,10 +43,10 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
   const handlePrint = () => {
     if (pdfRef.current) {
       const opt = {
-        margin: 0.5,
-        filename: `Invoice-${invoice.invoice_number}.pdf`,
+        margin: [0.3, 0.3, 0.3, 0.3] as [number, number, number, number],
+        filename: `${invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}-${invoice.invoice_number}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { scale: 1.5, useCORS: true, allowTaint: true },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
@@ -102,8 +102,8 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
         {/* Scrollable content area */}
         <div className="flex-1 overflow-auto">
           {/* Hidden printable content */}
-          <div ref={pdfRef} className="p-4 sm:p-6 bg-white" style={{ minWidth: '800px' }}>
-            <div className="max-w-4xl mx-auto">
+          <div ref={pdfRef} className="p-4 sm:p-6 bg-white" style={{ minWidth: '800px', maxWidth: '100%', overflow: 'hidden' }}>
+            <div className="max-w-4xl mx-auto" style={{ width: '100%' }}>
               {/* Header */}
               <div className="text-center mb-6 sm:mb-8 border-b-2 border-gray-300 pb-4 sm:pb-6">
                 <div className="flex justify-center items-center mb-4">
@@ -117,7 +117,7 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
               </div>
 
               {/* Invoice Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8" style={{ minWidth: '600px' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-8">
                 <div className="text-left">
                   <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-4 text-left">{invoice.document_type === 'quote' ? 'Quote To:' : 'Invoice To:'}</h2>
                   <div className="text-gray-700 text-left">
