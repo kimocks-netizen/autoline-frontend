@@ -5,6 +5,7 @@ import AdminNavbar from '../components/AdminNavbar';
 import InvoicePDF from '../components/InvoicePDF';
 import NewInvoiceModal from '../components/NewInvoiceModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
+import ConversionConfirmationModal from '../components/ConversionConfirmationModal';
 
 interface Invoice {
   id: string;
@@ -30,8 +31,11 @@ const InvoiceManagement = () => {
   const [isPDFOpen, setIsPDFOpen] = useState(false);
   const [isNewInvoiceModalOpen, setIsNewInvoiceModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isConversionModalOpen, setIsConversionModalOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState<{ id: string; type: 'invoice' | 'quote'; name: string } | null>(null);
+  const [conversionItem, setConversionItem] = useState<{ id: string; currentType: 'invoice' | 'quote'; documentNumber: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const invoicesPerPage = 10;
@@ -131,7 +135,18 @@ const InvoiceManagement = () => {
     }
   };
 
-  const handleConvertDocument = async (id: string, currentType: 'invoice' | 'quote') => {
+  const handleConvertClick = (invoice: Invoice) => {
+    setConversionItem({
+      id: invoice.id,
+      currentType: invoice.document_type,
+      documentNumber: invoice.invoice_number
+    });
+    setIsConversionModalOpen(true);
+  };
+
+  const handleConvertConfirm = async () => {
+    if (!conversionItem) return;
+
     const authStr = localStorage.getItem('auth');
     if (!authStr) return alert('Not authenticated');
 
@@ -145,18 +160,13 @@ const InvoiceManagement = () => {
       return;
     }
 
-    const newType = currentType === 'invoice' ? 'quote' : 'invoice';
-    const confirmMessage = `Are you sure you want to convert this ${currentType} to a ${newType}?`;
-    
-    if (!confirm(confirmMessage)) {
-      return;
-    }
+    setIsConverting(true);
 
     try {
-      console.log('Sending conversion request:', { id, newType });
+      console.log('Sending conversion request:', { id: conversionItem.id, newType: conversionItem.currentType === 'invoice' ? 'quote' : 'invoice' });
       const response = await axios.post(
-        `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${id}/convert`,
-        { newType },
+        `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${conversionItem.id}/convert`,
+        { newType: conversionItem.currentType === 'invoice' ? 'quote' : 'invoice' },
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -167,20 +177,111 @@ const InvoiceManagement = () => {
       console.log('Conversion response:', response.data);
 
       if (response.data.status === 'success') {
-        const message = response.data.data && response.data.data.id !== id 
-          ? `${currentType} converted to ${newType} successfully!` 
-          : `This ${currentType} has already been converted to a ${newType}.`;
-        alert(message);
         window.location.reload();
       }
     } catch (error: any) {
       console.error('Error converting document:', error);
       if (error.response) {
         console.error('Error response:', error.response.data);
-        alert(`Failed to convert document: ${error.response.data.message || 'Unknown error'}`);
-      } else {
-        alert('Failed to convert document. Please try again.');
       }
+    } finally {
+      setIsConverting(false);
+      setIsConversionModalOpen(false);
+      setConversionItem(null);
+    }
+  };
+
+  const handleConvertCancel = () => {
+    setIsConversionModalOpen(false);
+    setConversionItem(null);
+    setIsConverting(false);
+  };
+
+  const handleWhatsAppShare = async (invoice: Invoice) => {
+    try {
+      // Generate PDF blob
+      const pdfRef = document.createElement('div');
+      pdfRef.innerHTML = `
+        <div style="padding: 20px; font-family: Arial, sans-serif;">
+          <h1 style="color: #333; text-align: center; margin-bottom: 30px;">
+            ${invoice.document_type === 'quote' ? 'QUOTE' : 'INVOICE'}
+          </h1>
+          <div style="margin-bottom: 20px;">
+            <strong>Document Number:</strong> ${invoice.invoice_number}
+          </div>
+          <div style="margin-bottom: 20px;">
+            <strong>Customer:</strong> ${invoice.customer_name}
+          </div>
+          <div style="margin-bottom: 20px;">
+            <strong>Phone:</strong> ${invoice.customer_phone}
+          </div>
+          <div style="margin-bottom: 20px;">
+            <strong>Vehicle:</strong> ${invoice.car_model}
+            ${invoice.vehicle_reg_number ? ` (${invoice.vehicle_reg_number})` : ''}
+          </div>
+          <div style="margin-bottom: 20px;">
+            <strong>Repair Type:</strong> ${invoice.repair_type}
+          </div>
+          <div style="margin-bottom: 20px;">
+            <strong>Date:</strong> ${new Date(invoice.invoice_date).toLocaleDateString('en-ZA')}
+          </div>
+          <div style="margin-bottom: 20px;">
+            <strong>Total Amount:</strong> ${new Intl.NumberFormat('en-ZA', {
+              style: 'currency',
+              currency: 'ZAR',
+            }).format(invoice.total_amount)}
+          </div>
+        </div>
+      `;
+
+      // Generate PDF using html2pdf
+      const { default: html2pdf } = await import('html2pdf.js');
+      const opt = {
+        margin: 0.5,
+        filename: `${invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}-${invoice.invoice_number}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+
+      const pdfBlob = await html2pdf().from(pdfRef).set(opt).toPdf().get('pdf').then((pdf: any) => pdf.output('blob'));
+      
+      // Create a temporary URL for the PDF
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      
+      // Format phone number for WhatsApp (remove spaces and ensure it starts with country code)
+      let phoneNumber = invoice.customer_phone.replace(/\s+/g, '');
+      if (!phoneNumber.startsWith('+')) {
+        // Assume South African number if no country code
+        phoneNumber = '+27' + phoneNumber.replace(/^0/, '');
+      }
+      
+      // Create WhatsApp message with document
+      const message = `Hi ${invoice.customer_name}, please find attached your ${invoice.document_type === 'quote' ? 'quote' : 'invoice'} for ${invoice.repair_type} on your ${invoice.car_model}.`;
+      
+      // For WhatsApp Web API, we need to encode the message and create the URL
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+      
+      // Open WhatsApp with the message
+      window.open(whatsappUrl, '_blank');
+      
+      // Note: WhatsApp Web doesn't support direct file attachment via URL
+      // The user will need to manually attach the PDF after opening WhatsApp
+      // We can provide instructions or download the PDF for them
+      
+      // Download the PDF for the user to manually attach
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `${invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}-${invoice.invoice_number}.pdf`;
+      link.click();
+      
+      // Clean up the URL
+      setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+      
+    } catch (error) {
+      console.error('Error generating PDF for WhatsApp:', error);
+      alert('Error generating PDF. Please try again.');
     }
   };
 
@@ -385,13 +486,13 @@ const InvoiceManagement = () => {
                           View PDF
                         </button>
                         <button
-                          onClick={() => handleConvertDocument(invoice.id, invoice.document_type)}
+                          onClick={() => handleConvertClick(invoice)}
                           className="text-purple-600 hover:text-purple-800 underline text-xs"
                         >
                           Convert to {invoice.document_type === 'invoice' ? 'Quote' : 'Invoice'}
                         </button>
                         <button
-                          onClick={() => window.open(`https://wa.me/${invoice.customer_phone}`, '_blank')}
+                          onClick={() => handleWhatsAppShare(invoice)}
                           className="text-green-600 hover:text-green-800 text-xs"
                         >
                           WhatsApp
@@ -476,6 +577,18 @@ const InvoiceManagement = () => {
           message={`Are you sure you want to delete this ${deleteItem.type}?`}
           itemName={deleteItem.name}
           isLoading={isDeleting}
+        />
+      )}
+
+      {/* Conversion Confirmation Modal */}
+      {isConversionModalOpen && conversionItem && (
+        <ConversionConfirmationModal
+          isOpen={isConversionModalOpen}
+          onClose={handleConvertCancel}
+          onConfirm={handleConvertConfirm}
+          currentType={conversionItem.currentType}
+          documentNumber={conversionItem.documentNumber}
+          isLoading={isConverting}
         />
       )}
     </div>
