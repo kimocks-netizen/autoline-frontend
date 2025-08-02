@@ -153,6 +153,7 @@ const InvoiceManagement = () => {
     }
 
     try {
+      console.log('Sending conversion request:', { id, newType });
       const response = await axios.post(
         `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${id}/convert`,
         { newType },
@@ -163,6 +164,8 @@ const InvoiceManagement = () => {
         }
       );
 
+      console.log('Conversion response:', response.data);
+
       if (response.data.status === 'success') {
         const message = response.data.data && response.data.data.id !== id 
           ? `${currentType} converted to ${newType} successfully!` 
@@ -170,9 +173,14 @@ const InvoiceManagement = () => {
         alert(message);
         window.location.reload();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error converting document:', error);
-      alert('Failed to convert document. Please try again.');
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        alert(`Failed to convert document: ${error.response.data.message || 'Unknown error'}`);
+      } else {
+        alert('Failed to convert document. Please try again.');
+      }
     }
   };
 
