@@ -29,10 +29,10 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
   const handleDownloadPdf = () => {
     if (pdfRef.current) {
       const opt = {
-        margin: [0.3, 0.3, 0.3, 0.3] as [number, number, number, number],
-        filename: `${invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}-${invoice.invoice_number}.pdf`,
+        margin: 0.5,
+        filename: `Invoice-${invoice.invoice_number}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 1.5, useCORS: true, allowTaint: true },
+        html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
@@ -43,10 +43,10 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
   const handlePrint = () => {
     if (pdfRef.current) {
       const opt = {
-        margin: [0.3, 0.3, 0.3, 0.3] as [number, number, number, number],
-        filename: `${invoice.document_type === 'quote' ? 'Quote' : 'Invoice'}-${invoice.invoice_number}.pdf`,
+        margin: 0.5,
+        filename: `Invoice-${invoice.invoice_number}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 1.5, useCORS: true, allowTaint: true },
+        html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
@@ -102,8 +102,8 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
         {/* Scrollable content area */}
         <div className="flex-1 overflow-auto">
           {/* Hidden printable content */}
-          <div ref={pdfRef} className="p-4 sm:p-6 bg-white" style={{ minWidth: '800px', maxWidth: '100%', overflow: 'hidden' }}>
-            <div className="max-w-4xl mx-auto" style={{ width: '100%' }}>
+          <div ref={pdfRef} className="p-4 sm:p-6 bg-white">
+            <div className="max-w-4xl mx-auto">
               {/* Header */}
               <div className="text-center mb-6 sm:mb-8 border-b-2 border-gray-300 pb-4 sm:pb-6">
                 <div className="flex justify-center items-center mb-4">
