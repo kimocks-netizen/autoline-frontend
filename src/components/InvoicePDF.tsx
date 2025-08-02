@@ -224,7 +224,7 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
                 <p className="text-gray-600 text-sm sm:text-base">Your trusted partner for quality auto body repair and panel beating services.</p>
                 <p className="text-xs sm:text-sm text-gray-500 mt-2">
                   <a href="https://www.autolinepanelshop.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">www.autolinepanelshop.com</a> | 
-                  <a href="mailto:autolinepanelshop@gmail.com" className="text-blue-600 hover:underline">autolinepanelshop@gmail.com</a>
+                  <a href="mailto:autolinepanelshop@gmail.com" className="text-blue-600 hover:underline"> autolinepanelshop@gmail.com</a>
                 </p>
               </div>
             </div>
