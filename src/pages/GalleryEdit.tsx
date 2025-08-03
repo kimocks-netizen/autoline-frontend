@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../components/AdminNavbar';
 import { API_ENDPOINTS } from '../utils/api';
 import type { GalleryItem, GalleryFormData } from '../types/gallery';
-import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaUpload, FaSpinner } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
 import { supabase } from '../components/supabaseClient';
 
 const MAX_GALLERY_ITEMS = 6;
@@ -166,7 +166,7 @@ const GalleryEdit = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${imageType}/${Date.now()}-${Math.random()}.${fileExt}`;
       
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('gallery-images')
         .upload(fileName, file);
 
