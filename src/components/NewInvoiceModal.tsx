@@ -36,6 +36,7 @@ interface NewInvoiceModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDocumentCreated: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setCurrentInvoice: (invoice: any) => void;
   setIsInvoicePDFOpen: (open: boolean) => void;
   editInvoice?: Invoice; // Add this

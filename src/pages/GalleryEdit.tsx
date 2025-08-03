@@ -167,7 +167,8 @@ const GalleryEdit = () => {
       const fileName = `${imageType}/${Date.now()}-${Math.random()}.${fileExt}`;
       
       const { error } = await supabase.storage
-        .from('gallery-images')
+        //.from('gallery-images')
+        .from('damages-images')
         .upload(fileName, file);
 
       if (error) {
@@ -179,7 +180,8 @@ const GalleryEdit = () => {
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
-        .from('gallery-images')
+        //.from('gallery-images')
+        .from('damages-images')
         .getPublicUrl(fileName);
 
       setFormData(prev => ({
@@ -298,7 +300,7 @@ const GalleryEdit = () => {
             }`}
           >
             <FaPlus />
-            <span>Add New Item</span>
+            <span>New Item</span>
           </button>
         </div>
 

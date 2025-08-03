@@ -9,7 +9,7 @@ const FloatingWhatsAppButton = () => {
       className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-3 rounded-full shadow-lg transition duration-300 ease-in-out animate-bounce-delay"
       aria-label="Chat on WhatsApp"
     >
-      <FaWhatsapp size={20} />
+      <FaWhatsapp size={25} />
     </a>
   );
 };
