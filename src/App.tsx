@@ -8,7 +8,7 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import InvoiceManagement from './pages/InvoiceManagement';
 import GalleryEdit from './pages/GalleryEdit';
-//import FloatingWhatsAppButton from './components/FloatingWhatsAppButton';
+import FloatingWhatsAppButton from './components/FloatingWhatsAppButton';
 
 
 function App() {
@@ -26,7 +26,7 @@ function App() {
           <Route path="/admin/invoices" element={<InvoiceManagement />} />
           <Route path="/admin/gallery-edit" element={<GalleryEdit />} />
         </Routes>
-        {/*<FloatingWhatsAppButton />*/}
+          <FloatingWhatsAppButton />
       </div>
     </Router>
   );
