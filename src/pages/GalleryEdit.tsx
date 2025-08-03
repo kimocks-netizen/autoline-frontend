@@ -168,7 +168,7 @@ const GalleryEdit = () => {
       
       const { error } = await supabase.storage
         //.from('gallery-images')
-        .from('damages-images')
+        .from('damage-images')
         .upload(fileName, file);
 
       if (error) {
@@ -181,7 +181,7 @@ const GalleryEdit = () => {
       // Get public URL
       const { data: publicUrlData } = supabase.storage
         //.from('gallery-images')
-        .from('damages-images')
+        .from('damage-images')
         .getPublicUrl(fileName);
 
       setFormData(prev => ({
