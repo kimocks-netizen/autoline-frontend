@@ -6,6 +6,7 @@ import { supabase } from './supabaseClient';
 import { FiUpload, FiX } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { API_ENDPOINTS } from '../utils/api';
 
 type CountryCode = {
   code: string;
@@ -166,7 +167,7 @@ const QuoteForm = ({ darkMode = false }) => {
 }
 
         await axios.post(
-          'https://autolinepanel-backend-production.up.railway.app/api/quotes',
+          API_ENDPOINTS.PUBLIC_QUOTES,
           {
             name: values.name,
             phone: formattedPhone,

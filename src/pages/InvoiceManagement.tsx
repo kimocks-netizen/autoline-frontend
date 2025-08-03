@@ -7,6 +7,7 @@ import NewInvoiceModal from '../components/NewInvoiceModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import ConversionConfirmationModal from '../components/ConversionConfirmationModal';
 import { FaEllipsisV, FaEye, FaEdit, FaExchangeAlt, FaWhatsapp, FaTrash } from 'react-icons/fa';
+import { API_ENDPOINTS } from '../utils/api';
 
 interface Invoice {
   id: string;
@@ -71,7 +72,7 @@ const InvoiceManagement = () => {
 
       try {
         const response = await axios.get(
-          'https://autolinepanel-backend-production.up.railway.app/api/admin/invoices',
+          API_ENDPOINTS.ADMIN_INVOICES,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -129,7 +130,7 @@ const InvoiceManagement = () => {
       );
 
       const response = await axios.put(
-        `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${id}`,
+        API_ENDPOINTS.getInvoiceUpdateEndpoint(id),
         { status: newStatus },
         {
           headers: {
@@ -183,7 +184,7 @@ const InvoiceManagement = () => {
     try {
       console.log('Sending conversion request:', { id: conversionItem.id, newType: conversionItem.currentType === 'invoice' ? 'quote' : 'invoice' });
       const response = await axios.post(
-        `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${conversionItem.id}/convert`,
+        API_ENDPOINTS.getInvoiceConvertEndpoint(conversionItem.id),
         { newType: conversionItem.currentType === 'invoice' ? 'quote' : 'invoice' },
         {
           headers: {
@@ -283,7 +284,7 @@ const InvoiceManagement = () => {
       );
 
       const response = await axios.delete(
-        `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${deleteItem.id}`,
+        API_ENDPOINTS.getInvoiceDeleteEndpoint(deleteItem.id),
         {
           headers: {
             Authorization: `Bearer ${token}`

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../utils/api';
 
 interface Quote {
   id: string;
@@ -87,7 +88,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ quote, isOpen, onClose, onI
       const token = auth.token;
 
       const response = await axios.post(
-        'https://autolinepanel-backend-production.up.railway.app/api/admin/invoices',
+        API_ENDPOINTS.ADMIN_INVOICES,
         {
           quote_id: quote.id,
           ...formData,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../utils/api';
 
 interface Quote {
   id: string;
@@ -166,8 +167,8 @@ const NewInvoiceModal: React.FC<NewInvoiceModalProps> = ({
       const token = auth.token;
 
       const endpoint = isEditing 
-        ? `https://autolinepanel-backend-production.up.railway.app/api/admin/invoices/${editInvoice?.id}`
-        : 'https://autolinepanel-backend-production.up.railway.app/api/admin/invoices';
+        ? API_ENDPOINTS.getInvoiceUpdateEndpoint(editInvoice?.id || '')
+        : API_ENDPOINTS.ADMIN_INVOICES;
 
       const method = isEditing ? 'put' : 'post';
 

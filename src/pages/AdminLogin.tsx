@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
+import { API_ENDPOINTS } from '../utils/api';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +14,7 @@ const AdminLogin = () => {
       
       try {
         const response = await axios.post(
-          'https://autolinepanel-backend-production.up.railway.app/api/admin/login',
+          API_ENDPOINTS.ADMIN_LOGIN,
           {
             email,
             password

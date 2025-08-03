@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AdminNavbar from '../components/AdminNavbar';
 import NewInvoiceModal from '../components/NewInvoiceModal';
 import InvoicePDF from '../components/InvoicePDF';
+import { API_ENDPOINTS } from '../utils/api';
 type QuoteStatus = 'Pending' | 'Contacted' | 'Completed';
 type FilterStatus = QuoteStatus | 'All';
 
@@ -62,7 +63,7 @@ const AdminDashboard = () => {
 
       try {
         const response = await axios.get(
-          'https://autolinepanel-backend-production.up.railway.app/api/admin/quotes',
+          API_ENDPOINTS.ADMIN_QUOTES,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -109,7 +110,7 @@ const AdminDashboard = () => {
       );
 
       const response = await axios.put( // Changed from POST to PUT
-        `https://autolinepanel-backend-production.up.railway.app/api/admin/quotes/${id}/status`,
+        API_ENDPOINTS.getQuoteStatusEndpoint(id),
         { status: newStatus },
         {
           headers: {
