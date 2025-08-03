@@ -504,5 +504,4 @@ const GalleryEdit = () => {
     </div>
   );
 };
-
 export default GalleryEdit;
