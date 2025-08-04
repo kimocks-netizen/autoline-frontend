@@ -8,7 +8,7 @@ import type { GalleryItem, GalleryFormData } from '../types/gallery';
 import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
 import { supabase } from '../components/supabaseClient';
 
-const MAX_GALLERY_ITEMS = 6;
+const MAX_GALLERY_ITEMS = 6; // TODO: Change this to ANY
 
 const GalleryEdit = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
@@ -167,8 +167,7 @@ const GalleryEdit = () => {
       const fileName = `${imageType}/${Date.now()}-${Math.random()}.${fileExt}`;
       
       const { error } = await supabase.storage
-        //.from('gallery-images')
-        .from('damage-images')
+        .from('gallery-images')
         .upload(fileName, file);
 
       if (error) {
@@ -180,8 +179,7 @@ const GalleryEdit = () => {
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
-        //.from('gallery-images')
-        .from('damage-images')
+        .from('gallery-images')
         .getPublicUrl(fileName);
 
       setFormData(prev => ({
@@ -228,7 +226,6 @@ const GalleryEdit = () => {
           item.id === editingItem.id ? response.data.data : item
         ));
         // Refresh the gallery items to ensure we have the latest data
-        await fetchGalleryItems();
       }
       } else {
         // Create new item

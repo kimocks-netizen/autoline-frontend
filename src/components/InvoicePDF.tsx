@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef } from 'react';
 import { FaDownload, FaPrint, FaTimes } from 'react-icons/fa';
 import html2pdf from 'html2pdf.js';
@@ -111,7 +112,7 @@ const InvoicePDF: React.FC<InvoicePDFProps> = ({ invoice, onClose }) => {
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">AutoLine Panel Shop</h1>
                 <div className="text-xs sm:text-sm text-gray-600">
                   Professional Auto Body Repair & Panel Beating<br />
-                  Tel: <a href="tel:+27604755243" className="text-blue-600 hover:underline">+27 60 475 5243</a> | Email: <a href="mailto:autolinepanelshop@gmail.com" className="text-blue-600 hover:underline">autolinepanelshop@gmail.com</a><br />
+                  Tel: <a href="tel:+27676308447" className="text-blue-600 hover:underline">+27 67 630 8447</a> | Email: <a href="mailto:autolinepanelshop@gmail.com" className="text-blue-600 hover:underline">autolinepanelshop@gmail.com</a><br />
                   Address: <a href="https://maps.app.goo.gl/Xyk3tChq8AZpwdRm8" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">121 Stormvoël Rd, Lindopark, Pretoria</a><br />
                   Company Reg No: 2025/556147/07
                 </div>
