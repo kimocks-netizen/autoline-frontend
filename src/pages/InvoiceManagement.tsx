@@ -198,6 +198,7 @@ const InvoiceManagement = () => {
       if (response.data.status === 'success') {
         window.location.reload();
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Error converting document:', error);
       if (error.response) {
@@ -431,7 +432,15 @@ const InvoiceManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div>
-                        <div className="font-medium text-gray-900">{invoice.customer_name}</div>
+                        <div className="font-medium text-gray-900">
+                          {invoice.customer_name.length > 15 ? (
+                            <span title={invoice.customer_name}>
+                              {invoice.customer_name.substring(0, 15)}...
+                            </span>
+                          ) : (
+                            invoice.customer_name
+                          )}
+                        </div>
                         <div className="text-gray-500">{invoice.customer_phone}</div>
                       </div>
                     </td>

@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { API_ENDPOINTS } from '../utils/api';
+import { useToast } from '../components/ToastContext';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
     const handleLogin = async (e: FormEvent) => {
       e.preventDefault();
@@ -28,25 +30,39 @@ const AdminLogin = () => {
         );
 
         if (response.data.status === 'success') {
-          const authData = {
-            //token: response.data.data.token,
-            token: response.data.token,
-
-            expiresAt: Date.now() + 60 * 60 * 1000 // 1 hour from now
-          };
-          localStorage.setItem('auth', JSON.stringify(authData));
-          navigate('/admin/dashboard', { replace: true });
+          const token = response.data.token || response.data.data?.token;
+          
+                      if (token) {
+              // Store token in the format App.tsx expects
+              localStorage.setItem('adminToken', token);
+              
+              // Also store the full auth data for backward compatibility
+              const authData = {
+                token: token,
+                expiresAt: Date.now() + 2* 60 * 60 * 1000 // 2 hours from now
+              };
+              localStorage.setItem('auth', JSON.stringify(authData));
+              
+              showToast('Login successful! Welcome back.', 'success');
+              
+              // Dispatch custom event to notify App.tsx about login state change
+              window.dispatchEvent(new CustomEvent('loginStateChanged', { detail: { isLoggedIn: true } }));
+              
+              navigate('/admin/dashboard', { replace: true });
+            } else {
+              showToast('Login failed: No token received from server.', 'error');
+            }
         } else {
-          alert('Login failed: Unexpected response from server.');
+          showToast('Login failed: Unexpected response from server.', 'error');
         }
 
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const message = error.response?.data?.message || error.message || 'An error occurred while logging in.';
-          alert(`Login failed: ${message}`);
+          showToast(`Login failed: ${message}`, 'error');
           console.error('Axios error:', error);
         } else {
-          alert('An unexpected error occurred. Please try again.');
+          showToast('An unexpected error occurred. Please try again.', 'error');
           console.error('Unknown error:', error);
         }
       }

@@ -3,13 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, BellIcon } from 'lucide-react';
 import NavItem from './NavItem';
 import LogoImage from '../images/logo.png';
+import { useToast } from './ToastContext';
 const AdminNavbar = ({ darkMode = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const handleLogout = () => {
     localStorage.removeItem('auth');
+    localStorage.removeItem('adminToken');
+    
+    // Dispatch custom event to notify App.tsx about login state change
+    window.dispatchEvent(new CustomEvent('loginStateChanged', { detail: { isLoggedIn: false } }));
+    
+    showToast('Logged out successfully', 'error');
     navigate('/');
   };
 
@@ -47,7 +55,7 @@ const AdminNavbar = ({ darkMode = false }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             {/* Logo + Title */}
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/admin/dashboard" className="flex items-center space-x-2">
               <img src={LogoImage} alt="Autoline Logo" className="h-10 w-auto rounded-md" />
               <h1 className="text-xl font-bold">
                 <span className="bg-gradient-to-r from-primary-red to-dark-red bg-clip-text text-transparent">AUTOLINE</span>
