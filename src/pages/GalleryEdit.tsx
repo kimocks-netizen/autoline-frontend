@@ -8,7 +8,7 @@ import type { GalleryItem, GalleryFormData } from '../types/gallery';
 import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
 import { supabase } from '../components/supabaseClient';
 
-const MAX_GALLERY_ITEMS = 6; // TODO: Change this to ANY
+const MAX_GALLERY_ITEMS = 18; // Maximum gallery items allowed
 
 const GalleryEdit = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);

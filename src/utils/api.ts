@@ -4,7 +4,7 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://autoli
 // Alternative backend URLs (uncomment to use):
 // export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://autolinepanel-backend-production.up.railway.app';
 // export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://autolinepanel-backend-staging.up.railway.app';
-// export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
+//export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
 
 // API endpoints
 export const API_ENDPOINTS = {
