@@ -9,6 +9,7 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import InvoiceManagement from './pages/InvoiceManagement';
 import GalleryEdit from './pages/GalleryEdit';
+import ServicesEdit from './pages/ServicesEdit';
 import FloatingWhatsAppButton from './components/FloatingWhatsAppButton';
 import { ToastProvider } from './components/ToastContext';
 
@@ -98,6 +99,7 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/invoices" element={<InvoiceManagement />} />
             <Route path="/admin/gallery-edit" element={<GalleryEdit />} />
+            <Route path="/admin/services-edit" element={<ServicesEdit />} />
           </Routes>
           {!isLoggedIn && <FloatingWhatsAppButton />}
         </div>

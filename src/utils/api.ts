@@ -13,10 +13,12 @@ export const API_ENDPOINTS = {
   ADMIN_QUOTES: `${API_BASE_URL}/api/admin/quotes`,
   ADMIN_INVOICES: `${API_BASE_URL}/api/admin/invoices`,
   ADMIN_GALLERY: `${API_BASE_URL}/api/admin/gallery`,
+  ADMIN_SERVICES: `${API_BASE_URL}/api/admin/services`,
   
   // Public endpoints
   PUBLIC_QUOTES: `${API_BASE_URL}/api/quotes`,
   PUBLIC_GALLERY: `${API_BASE_URL}/api/gallery`,
+  PUBLIC_SERVICES: `${API_BASE_URL}/api/services`,
   
   // Helper functions
   getQuoteStatusEndpoint: (id: string) => `${API_BASE_URL}/api/admin/quotes/${id}/status`,
@@ -25,4 +27,5 @@ export const API_ENDPOINTS = {
   getInvoiceDeleteEndpoint: (id: string) => `${API_BASE_URL}/api/admin/invoices/${id}`,
   getInvoiceUpdateEndpoint: (id: string) => `${API_BASE_URL}/api/admin/invoices/${id}`,
   getGalleryItemEndpoint: (id: string) => `${API_BASE_URL}/api/admin/gallery/${id}`,
+  getServiceEndpoint: (id: string) => `${API_BASE_URL}/api/admin/services/${id}`,
 }; 

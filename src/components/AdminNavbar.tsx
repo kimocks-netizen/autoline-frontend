@@ -68,6 +68,7 @@ const AdminNavbar = ({ darkMode = false }) => {
               <NavItem to="/admin/dashboard" label="Quotes" darkMode={darkMode} />
               <NavItem to="/admin/invoices" label="Invoices & Quotes" darkMode={darkMode} />
               <NavItem to="/admin/gallery-edit" label="Gallery Edit" darkMode={darkMode} />
+              <NavItem to="/admin/services-edit" label="Services" darkMode={darkMode} />
               <button
                 className="relative p-2 rounded-full hover:bg-gray-700 hover:text-white transition"
               >
@@ -130,6 +131,12 @@ const AdminNavbar = ({ darkMode = false }) => {
               <NavItem
                 to="/admin/gallery-edit"
                 label="Gallery Edit"
+                onClick={() => setIsOpen(false)}
+                darkMode={darkMode}
+              />
+              <NavItem
+                to="/admin/services-edit"
+                label="Services"
                 onClick={() => setIsOpen(false)}
                 darkMode={darkMode}
               />
