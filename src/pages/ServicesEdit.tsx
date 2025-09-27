@@ -222,6 +222,8 @@ const ServicesEdit = () => {
           setServices(prev => prev.map(service => 
             service.id === editingService.id ? response.data.data : service
           ));
+          // Refresh the services to ensure we have the latest data
+          await fetchServices();
         }
       } else {
         // Create new service
