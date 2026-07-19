@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Environment variables with fallbacks
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://xvsrfwezxirnbjukthwj.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2c3Jmd2V6eGlybmJqdWt0aHdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwNzIxNTcsImV4cCI6MjA2NzY0ODE1N30.hfFRQO6t3NnVOCMpE2XSNQAFEpokLfVMPur46J9yM4g';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://cfmpqxtsrbkoxohubjof.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmbXBxeHRzcmJrb3hvaHViam9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0MjM0MDYsImV4cCI6MjA5OTk5OTQwNn0.ppZOa35DiSiK0z78m1wCyG8oRIoa1u-DELIFFWPI-H4';
 
 // Debug logging (remove in production)
 if (import.meta.env.DEV) {
