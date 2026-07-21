@@ -65,7 +65,8 @@ const AdminNavbar = ({ darkMode = false }) => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <NavItem to="/admin/dashboard" label="Quotes" darkMode={darkMode} />
+              <NavItem to="/admin/dashboard" label="Dashboard" darkMode={darkMode} />
+              <NavItem to="/admin/quotes" label="Quotes" darkMode={darkMode} />
               <NavItem to="/admin/invoices" label="Invoices & Quotes" darkMode={darkMode} />
               <NavItem to="/admin/gallery-edit" label="Gallery Edit" darkMode={darkMode} />
               <NavItem to="/admin/services-edit" label="Services" darkMode={darkMode} />
@@ -118,6 +119,12 @@ const AdminNavbar = ({ darkMode = false }) => {
             <div className="flex flex-col px-4 py-4 space-y-2">
               <NavItem
                 to="/admin/dashboard"
+                label="Dashboard"
+                onClick={() => setIsOpen(false)}
+                darkMode={darkMode}
+              />
+              <NavItem
+                to="/admin/quotes"
                 label="Quotes"
                 onClick={() => setIsOpen(false)}
                 darkMode={darkMode}

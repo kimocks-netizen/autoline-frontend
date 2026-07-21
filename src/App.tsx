@@ -6,6 +6,7 @@ import Services from './pages/Services';
 import Gallery from './pages/Gallery';
 import RequestQuote from './pages/RequestQuote';
 import AdminLogin from './pages/AdminLogin';
+import AdminLanding from './pages/AdminLanding';
 import AdminDashboard from './pages/AdminDashboard';
 import InvoiceManagement from './pages/InvoiceManagement';
 import GalleryEdit from './pages/GalleryEdit';
@@ -96,7 +97,8 @@ function App() {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/request-quote" element={<RequestQuote />} />
             <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminLanding />} />
+            <Route path="/admin/quotes" element={<AdminDashboard />} />
             <Route path="/admin/invoices" element={<InvoiceManagement />} />
             <Route path="/admin/gallery-edit" element={<GalleryEdit />} />
             <Route path="/admin/services-edit" element={<ServicesEdit />} />
