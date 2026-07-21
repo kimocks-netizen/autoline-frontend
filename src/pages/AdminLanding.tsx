@@ -54,7 +54,7 @@ const AdminLanding = () => {
         {/* Welcome */}
         <div className="mb-10">
           <p className="text-primary-red font-semibold text-sm uppercase tracking-widest mb-1">Admin Portal</p>
-          <h1 className="text-4xl font-black text-gray-900">
+          <h1 className="text-2xl font-black text-gray-900">
             Welcome back, <span className="text-primary-blue">Admin</span>
           </h1>
           <p className="text-gray-500 mt-2 text-sm">Select a section below to get started.</p>
